@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulasi Hukum Kekekalan Momentum (Three.js)</title>
+    <!-- Memuat Tailwind CSS untuk styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Memuat Three.js untuk visualisasi 3D -->
+    <script async src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        /* Mengatur font dan menghilangkan margin default */
+        body { font-family: 'Inter', sans-serif; margin: 0; }
+        /* Mengatur agar canvas mengisi container */
+        #canvas-container { height: 100%; width: 100%; }
+        canvas { display: block; }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-blue': '#1e40af',
+                        'accent-orange': '#f97316',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50 h-screen overflow-hidden flex flex-col">
+
+    <!-- Header -->
+    <header class="bg-white shadow-md p-4 flex justify-between items-center z-10">
+        <h1 class="text-2xl font-extrabold text-primary-blue">Simulasi Fisika 3D</h1>
+        <div class="text-sm font-medium text-gray-600">Hukum Kekekalan Momentum</div>
+    </header>
+
+    <!-- Konten Utama: Teori, Input, dan Canvas -->
+    <main class="flex-grow flex flex-col lg:flex-row overflow-hidden">
+        
+        <!-- Panel Kiri: Teori & Kontrol Input -->
+        <div class="lg:w-1/3 p-6 overflow-y-auto bg-white shadow-lg flex flex-col space-y-6">
+            
+            <!-- Bagian Teori -->
+            <section>
+                <h2 class="text-xl font-bold mb-3 text-accent-orange border-b-2 border-accent-orange pb-1">Teori: Kekekalan Momentum</h2>
+                <p class="text-gray-700 text-sm">
+                    Hukum Kekekalan Momentum menyatakan bahwa jika tidak ada gaya luar yang bekerja pada sistem (sistem terisolasi), total momentum sistem tersebut sebelum dan sesudah tumbukan akan **tetap sama**.
+                </p>
+                <p class="mt-2 text-sm font-semibold text-gray-800">
+                    <span class="text-primary-blue">Rumus:</span> 
+                    $m_1 v_{1i} + m_2 v_{2i} = m_1 v_{1f} + m_2 v_{2f}$
+                </p>
+                <ul class="text-xs list-disc list-inside mt-2 text-gray-600">
+                    <li>$m$: Massa (kg)</li>
+                    <li>$v_{i}$: Kecepatan awal (m/s)</li>
+                    <li>$v_{f}$: Kecepatan akhir (m/s)</li>
+                </ul>
+            </section>
+
+            <!-- Bagian Input & Kontrol -->
+            <section class="mt-4 p-4 bg-gray-100 rounded-lg shadow-inner">
+                <h2 class="text-xl font-bold mb-4 text-primary-blue">Input Variabel Tumbukan</h2>
+                <div id="status-message" class="text-sm text-red-600 mb-3 hidden"></div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <!-- Objek 1 -->
+                    <div class="p-3 bg-white rounded-md border border-gray-200">
+                        <h3 class="font-bold text-sm text-primary-blue">Objek 1 (Merah)</h3>
+                        <label class="block mt-2 text-xs font-medium text-gray-600">Massa $m_1$ (kg)</label>
+                        <input type="number" id="m1" value="2.0" min="0.1" step="0.1" class="w-full p-1 border rounded-md text-sm">
+                        <label class="block mt-2 text-xs font-medium text-gray-600">Kecepatan Awal $v_{1i}$ (m/s)</label>
+                        <input type="number" id="v1i" value="1.5" step="0.1" class="w-full p-1 border rounded-md text-sm">
+                    </div>
+
+                    <!-- Objek 2 -->
+                    <div class="p-3 bg-white rounded-md border border-gray-200">
+                        <h3 class="font-bold text-sm text-primary-blue">Objek 2 (Hijau)</h3>
+                        <label class="block mt-2 text-xs font-medium text-gray-600">Massa $m_2$ (kg)</label>
+                        <input type="number" id="m2" value="1.0" min="0.1" step="0.1" class="w-full p-1 border rounded-md text-sm">
+                        <label class="block mt-2 text-xs font-medium text-gray-600">Kecepatan Awal $v_{2i}$ (m/s)</label>
+                        <input type="number" id="v2i" value="-2.0" step="0.1" class="w-full p-1 border rounded-md text-sm">
+                    </div>
+                </div>
+
+                <!-- Kontainer untuk dua tombol: MULAI dan RESET -->
+                <div class="flex space-x-2 mt-4">
+                    <button id="start-button" class="flex-1 bg-accent-orange text-white font-bold py-2 rounded-lg shadow-md hover:bg-orange-600 transition duration-300">
+                        Mulai Simulasi
+                    </button>
+                    <button id="reset-button" class="flex-1 bg-gray-500 text-white font-bold py-2 rounded-lg shadow-md hover:bg-gray-600 transition duration-300">
+                        Reset Simulasi
+                    </button>
+                </div>
+            </section>
+
+            <!-- Bagian Hasil & Data -->
+            <section class="mt-4 p-4 bg-gray-100 rounded-lg shadow-inner">
+                <h2 class="text-xl font-bold mb-2 text-primary-blue">Hasil Simulasi</h2>
+                <div class="text-sm space-y-1">
+                    <p class="font-medium">Total Momentum Awal: <span id="initial-momentum" class="font-bold text-green-700">0.00 kg.m/s</span></p>
+                    <p class="font-medium">Total Momentum Akhir: <span id="final-momentum" class="font-bold text-green-700">N/A</span></p>
+                    <p class="mt-3 font-semibold text-primary-blue">Kecepatan Akhir (Terhitung):</p>
+                    <ul class="text-xs list-disc list-inside ml-4">
+                        <li>Objek 1 ($v_{1f}$): <span id="v1f-calc">N/A</span> m/s</li>
+                        <li>Objek 2 ($v_{2f}$): <span id="v2f-calc">N/A</span> m/s</li>
+                    </ul>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- Panel Kanan: Canvas 3D Three.js -->
+        <div id="canvas-container" class="lg:w-2/3 bg-gray-200 relative">
+            <div id="three-canvas" class="w-full h-full"></div>
+            <div id="overlay-text" class="absolute top-4 left-1/2 transform -translate-x-1/2 p-2 bg-black bg-opacity-70 text-white rounded-lg text-sm font-mono transition-opacity duration-500">
+                Simulasi Siap
+            </div>
+            <div id="mobile-hint" class="lg:hidden absolute bottom-2 left-1/2 transform -translate-x-1/2 text-xs text-gray-400 bg-black bg-opacity-50 p-1 rounded">
+                (Geser ke atas untuk Input)
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        // Deklarasi variabel global Three.js
+        let scene, camera, renderer, ball1, ball2, plane;
+        let v1i, v2i, m1, m2;
+        let v1f, v2f;
+        let isSimulating = false;
+        let hasCollided = false;
+        const radiusScale = 0.5; // Faktor skala untuk jari-jari berdasarkan massa
+
+        // DOM elements
+        const startButton = document.getElementById('start-button');
+        const resetButton = document.getElementById('reset-button'); // Tombol Reset baru
+        const canvasContainer = document.getElementById('three-canvas');
+        const initialMomentumDisplay = document.getElementById('initial-momentum');
+        const finalMomentumDisplay = document.getElementById('final-momentum');
+        const v1fCalcDisplay = document.getElementById('v1f-calc');
+        const v2fCalcDisplay = document.getElementById('v2f-calc');
+        const statusMessage = document.getElementById('status-message');
+        const overlayText = document.getElementById('overlay-text');
+        
+        // Fungsi Inisialisasi Three.js
+        function init() {
+            // Scene
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xf0f0f0); // Latar belakang abu-abu muda
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(75, canvasContainer.clientWidth / canvasContainer.clientHeight, 0.1, 1000);
+            camera.position.set(0, 3, 15);
+            camera.lookAt(0, 0, 0);
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(canvasContainer.clientWidth, canvasContainer.clientHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            canvasContainer.appendChild(renderer.domElement);
+
+            // Pencahayaan
+            const ambientLight = new THREE.AmbientLight(0x404040, 2);
+            scene.add(ambientLight);
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 1.5);
+            directionalLight.position.set(5, 10, 7.5);
+            scene.add(directionalLight);
+
+            // Permukaan (Plane)
+            const planeGeometry = new THREE.PlaneGeometry(50, 20);
+            const planeMaterial = new THREE.MeshLambertMaterial({ color: 0xcccccc });
+            plane = new THREE.Mesh(planeGeometry, planeMaterial);
+            plane.rotation.x = -Math.PI / 2;
+            plane.position.y = -1.5;
+            scene.add(plane);
+
+            // Buat objek awal
+            createBalls();
+
+            // Event listener untuk resize
+            window.addEventListener('resize', onWindowResize, false);
+        }
+
+        function createBalls() {
+            // Ambil input awal
+            m1 = parseFloat(document.getElementById('m1').value);
+            m2 = parseFloat(document.getElementById('m2').value);
+
+            // Hapus bola lama jika ada
+            if (ball1) scene.remove(ball1);
+            if (ball2) scene.remove(ball2);
+
+            // Objek 1 (Merah)
+            const r1 = radiusScale * Math.cbrt(m1); // Jari-jari proporsional terhadap akar pangkat tiga massa (volume)
+            const geometry1 = new THREE.SphereGeometry(r1, 32, 32);
+            const material1 = new THREE.MeshPhongMaterial({ color: 0xff4444, shininess: 80 });
+            ball1 = new THREE.Mesh(geometry1, material1);
+            ball1.position.set(-10, r1 - 1.5, 0); // Posisi awal di kiri
+            ball1.userData = { mass: m1, initialRadius: r1 }; // Simpan data massa
+            scene.add(ball1);
+
+            // Objek 2 (Hijau)
+            const r2 = radiusScale * Math.cbrt(m2);
+            const geometry2 = new THREE.SphereGeometry(r2, 32, 32);
+            const material2 = new THREE.MeshPhongMaterial({ color: 0x44ff44, shininess: 80 });
+            ball2 = new THREE.Mesh(geometry2, material2);
+            ball2.position.set(10, r2 - 1.5, 0); // Posisi awal di kanan
+            ball2.userData = { mass: m2, initialRadius: r2 };
+            scene.add(ball2);
+        }
+
+        function onWindowResize() {
+            const width = canvasContainer.clientWidth;
+            const height = canvasContainer.clientHeight;
+            camera.aspect = width / height;
+            camera.updateProjectionMatrix();
+            renderer.setSize(width, height);
+        }
+
+        // Fungsi Perhitungan Tumbukan Elastis 1D
+        function calculateFinalVelocities(m1, v1i, m2, v2i) {
+            // Rumus tumbukan elastis 1D
+            const v1f = (v1i * (m1 - m2) + 2 * m2 * v2i) / (m1 + m2);
+            const v2f = (v2i * (m2 - m1) + 2 * m1 * v1i) / (m1 + m2);
+            return { v1f, v2f };
+        }
+
+        // Fungsi Mulai Simulasi
+        function startSimulation() {
+            // Reset status
+            isSimulating = false;
+            hasCollided = false;
+            statusMessage.classList.add('hidden');
+            overlayText.textContent = "Simulasi Siap";
+            overlayText.classList.remove('opacity-0');
+            
+            // Ambil nilai input
+            m1 = parseFloat(document.getElementById('m1').value);
+            v1i = parseFloat(document.getElementById('v1i').value);
+            m2 = parseFloat(document.getElementById('m2').value);
+            v2i = parseFloat(document.getElementById('v2i').value);
+
+            // Validasi sederhana
+            if (m1 <= 0 || m2 <= 0) {
+                statusMessage.textContent = "Massa harus lebih besar dari 0!";
+                statusMessage.classList.remove('hidden');
+                return;
+            }
+            // Tambahkan validasi agar tumbukan terjadi (kecepatan objek 1 harus lebih besar dari objek 2 jika keduanya positif, atau mereka bergerak saling mendekat)
+            if (v1i === v2i) {
+                statusMessage.textContent = "Kecepatan awal tidak boleh sama persis (bola tidak akan bertabrakan)!";
+                statusMessage.classList.remove('hidden');
+                return;
+            }
+            if (v1i < v2i) {
+                // Objek 1 di kiri, Objek 2 di kanan. Jika v1i < v2i, Objek 2 menjauhi Objek 1, tumbukan tidak terjadi
+                statusMessage.textContent = "Objek 1 harus lebih cepat dari Objek 2 agar terjadi tumbukan!";
+                statusMessage.classList.remove('hidden');
+                return;
+            }
+
+
+            // Hitung kecepatan akhir
+            const results = calculateFinalVelocities(m1, v1i, m2, v2i);
+            v1f = results.v1f;
+            v2f = results.v2f;
+
+            // Tampilkan hasil perhitungan
+            const initialMomentum = (m1 * v1i + m2 * v2i).toFixed(2);
+            const finalMomentumCalculated = (m1 * v1f + m2 * v2f).toFixed(2);
+            initialMomentumDisplay.textContent = `${initialMomentum} kg.m/s`;
+            finalMomentumDisplay.textContent = `Menunggu Tumbukan...`;
+            v1fCalcDisplay.textContent = v1f.toFixed(2);
+            v2fCalcDisplay.textContent = v2f.toFixed(2);
+
+            // Reset posisi bola di 3D
+            createBalls(); // Memanggil ini juga akan mengupdate ukuran bola
+            ball1.position.x = -10;
+            ball2.position.x = 10;
+
+            // Tampilkan status dan atur tombol
+            overlayText.textContent = "Tumbukan Dimulai...";
+            startButton.disabled = true;
+            startButton.textContent = "Simulasi Berjalan...";
+            resetButton.disabled = false;
+            
+            isSimulating = true;
+        }
+
+        // Variabel untuk menghitung waktu (deltaTime) agar pergerakan halus dan independen dari framerate
+        let lastTime = 0;
+
+        // Loop Animasi
+        function animate(time) {
+            requestAnimationFrame(animate);
+
+            if (isSimulating) {
+                // Hitung deltaTime dalam detik
+                const deltaTime = (time - lastTime) / 1000;
+                lastTime = time;
+
+                if (!hasCollided) {
+                    // Pergerakan sebelum tumbukan (gunakan kecepatan awal)
+                    ball1.position.x += v1i * deltaTime * 3; // Faktor 3 untuk mempercepat simulasi
+                    ball2.position.x += v2i * deltaTime * 3;
+
+                    // Deteksi Tumbukan (ketika jarak antara pusat bola kurang dari jumlah jari-jari)
+                    const r1 = ball1.userData.initialRadius;
+                    const r2 = ball2.userData.initialRadius;
+                    const distance = ball2.position.x - ball1.position.x;
+
+                    if (distance <= (r1 + r2)) {
+                        hasCollided = true;
+                        
+                        // Perhitungan momentum akhir di simulasi
+                        const momentumAkhirSimulasi = (m1 * v1f + m2 * v2f).toFixed(2);
+                        finalMomentumDisplay.textContent = `${momentumAkhirSimulasi} kg.m/s`;
+
+                        // Posisikan bola tepat pada saat tumbukan (opsional, untuk akurasi visual)
+                        const overlap = (r1 + r2) - distance;
+                        const totalMass = m1 + m2;
+                        ball1.position.x -= (overlap * m2 / totalMass);
+                        ball2.position.x += (overlap * m1 / totalMass);
+
+                        // Update tampilan
+                        overlayText.textContent = `TUMBUKAN! Momentum Akhir: ${momentumAkhirSimulasi} kg.m/s`;
+                    }
+                } else {
+                    // Pergerakan setelah tumbukan (gunakan kecepatan akhir)
+                    ball1.position.x += v1f * deltaTime * 3;
+                    ball2.position.x += v2f * deltaTime * 3;
+
+                    // Deteksi Batas Akhir Simulasi (bola sudah jauh)
+                    if (ball1.position.x < -15 || ball1.position.x > 15 || ball2.position.x < -15 || ball2.position.x > 15) {
+                        isSimulating = false;
+                        startButton.disabled = false;
+                        startButton.textContent = "Mulai Simulasi";
+                        overlayText.textContent = "Simulasi Selesai. Silakan coba parameter lain.";
+                        overlayText.classList.add('opacity-100');
+                    }
+                }
+            }
+
+            renderer.render(scene, camera);
+        }
+
+        // Inisialisasi dan Mulai
+        window.onload = function () {
+            init();
+            animate();
+            
+            // Tambahkan event listener ke tombol MULAI
+            startButton.addEventListener('click', startSimulation);
+            
+            // Tambahkan event listener ke tombol RESET (mengulang startSimulation)
+            resetButton.addEventListener('click', startSimulation);
+
+            // Panggil startSimulation sekali untuk inisialisasi tampilan awal
+            startSimulation();
+        }
+    </script>
+</body>
+</html>
