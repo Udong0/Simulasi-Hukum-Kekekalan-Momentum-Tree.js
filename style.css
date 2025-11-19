@@ -1,0 +1,19 @@
+/* * STYLE.CSS
+ * Styling dasar yang tidak ditangani oleh Tailwind CSS.
+ */
+
+/* Mengatur font dan menghilangkan margin default */
+body {
+  font-family: "Inter", sans-serif;
+  margin: 0;
+}
+/* Kontainer utama canvas */
+#canvas-wrapper {
+  height: 100%;
+  width: 100%;
+}
+/* Canvas Three.js */
+canvas {
+  display: block;
+  outline: none;
+}

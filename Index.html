@@ -1,350 +1,295 @@
 <!DOCTYPE html>
 <html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulasi Hukum Kekekalan Momentum</title>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simulasi Hukum Kekekalan Momentum (Three.js)</title>
+
+    <!-- Pemuatan CSS (Link ke berkas style.css) -->
+    <link rel="stylesheet" href="style.css" />
+
+    <!-- Pemuatan CSS Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
+    <script>
+      // Konfigurasi Tailwind untuk warna kustom (Perlu tetap di sini agar konfigurasi warna di HTML dikenal)
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              "primary-blue": "#1e40af",
+              "accent-orange": "#f97316",
+            },
+          },
+        },
+      };
+    </script>
+
+    <!-- Pemuatan JavaScript Libraries (Diletakkan di body/atas untuk memastikan pemuatan berurutan) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-
-    <style>
-        body { font-family: 'Inter', sans-serif; margin: 0; }
-        #canvas-container { height: 100%; width: 100%; }
-        canvas { display: block; outline: none; }
-    </style>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        'primary-blue': '#1e40af',
-                        'accent-orange': '#f97316',
-                    }
-                }
-            }
-        }
-    </script>
-</head>
-<body class="bg-gray-50 h-screen overflow-hidden flex flex-col">
-
-    <header class="bg-white shadow-md p-4 flex justify-between items-center z-10">
-        <div>
-            <h1 class="text-2xl font-extrabold text-primary-blue">Simulasi Fisika 3D</h1>
-            <div class="text-sm font-medium text-gray-600">Hukum Kekekalan Momentum</div>
+  </head>
+  <body class="bg-gray-50 h-screen overflow-hidden flex flex-col">
+    <!-- Header Aplikasi -->
+    <header
+      class="bg-white shadow-md p-4 flex justify-between items-center z-10"
+    >
+      <div>
+        <h1 class="text-2xl font-extrabold text-primary-blue">
+          Simulasi Fisika 3D
+        </h1>
+        <div class="text-sm font-medium text-gray-600">
+          Hukum Kekekalan Momentum
         </div>
+      </div>
     </header>
 
+    <!-- Konten Utama: Teori, Input, dan Canvas -->
     <main class="flex-grow flex flex-col lg:flex-row overflow-hidden">
-        
-        <div class="lg:w-1/3 p-6 overflow-y-auto bg-white shadow-lg flex flex-col space-y-6">
-            <section>
-                <h2 class="text-xl font-bold mb-3 text-accent-orange border-b-2 border-accent-orange pb-1">Teori: Kekekalan Momentum</h2>
-                <p class="text-gray-700 text-sm">
-                    Hukum Kekekalan Momentum menyatakan bahwa jika tidak ada gaya luar yang bekerja pada sistem (sistem terisolasi), total momentum sistem tersebut sebelum dan sesudah tumbukan akan tetap sama.
-                </p>
-                <p class="mt-2 text-sm font-semibold text-gray-800">
-                    <span class="text-primary-blue">Rumus:</span> 
-                    m1 v1i + m2 v2i = m1 v1f + m2 v2f
-                </p>
-                <ul class="text-xs list-disc list-inside mt-2 text-gray-600">
-                    <li>m: Massa (kg)</li>
-                    <li>vi: Kecepatan awal (m/s)</li>
-                    <li>vf: Kecepatan akhir (m/s)</li>
-                </ul>
-            </section>
+      <!-- Panel Kiri: Teori & Kontrol Input (40%) -->
+      <div
+        class="lg:w-2/5 p-6 overflow-y-auto bg-white shadow-lg flex flex-col space-y-6"
+      >
+        <!-- Bagian Teori (Menggunakan Unicode) -->
+        <section>
+          <h2
+            class="text-xl font-bold mb-3 text-accent-orange border-b-2 border-accent-orange pb-1"
+          >
+            Teori: Kekekalan Momentum
+          </h2>
 
-            <section class="mt-4 p-4 bg-gray-100 rounded-lg shadow-inner">
-                <h2 class="text-xl font-bold mb-4 text-primary-blue">Input Variabel</h2>
-                <div id="status-message" class="text-sm text-red-600 mb-3 hidden"></div>
+          <p class="text-gray-700 text-sm">
+            Hukum Kekekalan Momentum menyatakan bahwa jika tidak ada gaya luar
+            yang bekerja pada sistem (sistem terisolasi), total momentum sistem
+            tersebut sebelum dan sesudah tumbukan akan tetap sama.
+          </p>
 
-                <div class="grid grid-cols-2 gap-4">
-                    <div class="p-3 bg-white rounded-md border border-gray-200">
-                        <h3 class="font-bold text-sm text-primary-blue">Objek 1 (Merah)</h3>
-                        <label class="block mt-2 text-xs font-medium text-gray-600">Massa m1 (kg)</label>
-                        <input type="number" id="m1" value="2.0" min="0.1" step="0.1" class="w-full p-1 border rounded-md text-sm">
-                        <label class="block mt-2 text-xs font-medium text-gray-600">Kecepatan Awal v1i</label>
-                        <input type="number" id="v1i" value="1.5" step="0.1" class="w-full p-1 border rounded-md text-sm">
-                    </div>
+          <p class="mt-2 text-sm font-semibold text-gray-800">
+            <span class="text-primary-blue"
+              >Rumus Umum (dengan koefisien restitusi e):</span
+            ><br />
+            m₁ v₁ᵢ + m₂ v₂ᵢ = m₁ v₁f + m₂ v₂f
+          </p>
 
-                    <div class="p-3 bg-white rounded-md border border-gray-200">
-                        <h3 class="font-bold text-sm text-primary-blue">Objek 2 (Hijau)</h3>
-                        <label class="block mt-2 text-xs font-medium text-gray-600">Massa m2 (kg)</label>
-                        <input type="number" id="m2" value="1.0" min="0.1" step="0.1" class="w-full p-1 border rounded-md text-sm">
-                        <label class="block mt-2 text-xs font-medium text-gray-600">Kecepatan Awal v2i</label>
-                        <input type="number" id="v2i" value="-2.0" step="0.1" class="w-full p-1 border rounded-md text-sm">
-                    </div>
-                </div>
+          <p class="mt-2 text-sm font-semibold text-gray-800">
+            <span class="text-primary-blue">Koefisien Restitusi:</span><br />
+            e = – (v₁f – v₂f) / (v₁ᵢ – v₂ᵢ)
+          </p>
 
-                <div class="flex space-x-2 mt-4">
-                    <button id="start-button" class="flex-1 bg-accent-orange text-white font-bold py-2 rounded-lg shadow-md hover:bg-orange-600 transition duration-300">
-                        Mulai
-                    </button>
-                    <button id="reset-button" class="flex-1 bg-gray-500 text-white font-bold py-2 rounded-lg shadow-md hover:bg-gray-600 transition duration-300">
-                        Reset
-                    </button>
-                </div>
-            </section>
+          <ul class="text-xs list-disc list-inside mt-1 text-gray-600">
+            <li>e = 1 : Elastis sempurna</li>
+            <li>e = 0 : Tidak elastis sempurna (objek menempel)</li>
+          </ul>
 
-            <section class="mt-4 p-4 bg-gray-100 rounded-lg shadow-inner">
-                <h2 class="text-xl font-bold mb-2 text-primary-blue">Hasil Simulasi</h2>
-                <div class="text-sm space-y-1">
-                    <p class="font-medium">Total Momentum Awal: <span id="initial-momentum" class="font-bold text-green-700">0.00 kg.m/s</span></p>
-                    <p class="font-medium">Total Momentum Akhir: <span id="final-momentum" class="font-bold text-green-700">N/A</span></p>
-                    <p class="mt-3 font-semibold text-primary-blue">Kecepatan Akhir (Terhitung):</p>
-                    <ul class="text-xs list-disc list-inside ml-4">
-                        <li>Objek 1 v1f: <span id="v1f-calc">N/A</span> m/s</li>
-                        <li>Objek 2 v2f: <span id="v2f-calc">N/A</span> m/s</li>
-                    </ul>
-                </div>
-            </section>
+          <ul class="text-xs list-disc list-inside mt-2 text-gray-600">
+            <li>m : massa (kg)</li>
+            <li>vᵢ : kecepatan awal (m/s)</li>
+            <li>v𝒇 : kecepatan akhir (m/s)</li>
+          </ul>
+        </section>
+
+        <!-- Bagian Input & Kontrol -->
+        <section class="mt-4 p-4 bg-gray-100 rounded-lg shadow-inner">
+          <h2 class="text-xl font-bold mb-4 text-primary-blue">
+            Input Variabel
+          </h2>
+          <div
+            id="status-message"
+            class="text-sm text-red-600 mb-3 hidden"
+          ></div>
+
+          <!-- Slider Koefisien Restitusi -->
+          <div
+            class="mb-4 p-3 bg-yellow-100 rounded-md border border-yellow-200"
+          >
+            <label
+              for="restitution-coefficient"
+              class="block text-sm font-bold text-gray-700 mb-2"
+              >Koefisien Restitusi (e):
+              <span id="e-value" class="font-mono text-accent-orange"
+                >1.00</span
+              ></label
+            >
+            <input
+              type="range"
+              id="restitution-coefficient"
+              min="0.0"
+              max="1.0"
+              step="0.01"
+              value="1.0"
+              class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+            />
+            <p class="text-xs text-gray-500 mt-1">Atur kekenyalan tumbukan.</p>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
+            <!-- Objek 1 -->
+            <div class="p-3 bg-white rounded-md border border-gray-200">
+              <h3 class="font-bold text-sm text-primary-blue">
+                Objek 1 (Merah)
+              </h3>
+              <label class="block mt-2 text-xs font-medium text-gray-600"
+                >Massa m₁ (kg)</label
+              >
+              <input
+                type="number"
+                id="m1"
+                value="2.0"
+                min="0.1"
+                step="0.1"
+                class="w-full p-1 border rounded-md text-sm"
+              />
+              <label class="block mt-2 text-xs font-medium text-gray-600"
+                >Kecepatan Awal v₁ᵢ</label
+              >
+              <input
+                type="number"
+                id="v1i"
+                value="1.5"
+                step="0.1"
+                class="w-full p-1 border rounded-md text-sm"
+              />
+            </div>
+
+            <!-- Objek 2 -->
+            <div class="p-3 bg-white rounded-md border border-gray-200">
+              <h3 class="font-bold text-sm text-primary-blue">
+                Objek 2 (Hijau)
+              </h3>
+              <label class="block mt-2 text-xs font-medium text-gray-600"
+                >Massa m₂ (kg)</label
+              >
+              <input
+                type="number"
+                id="m2"
+                value="1.0"
+                min="0.1"
+                step="0.1"
+                class="w-full p-1 border rounded-md text-sm"
+              />
+              <label class="block mt-2 text-xs font-medium text-gray-600"
+                >Kecepatan Awal v₂ᵢ</label
+              >
+              <input
+                type="number"
+                id="v2i"
+                value="-2.0"
+                step="0.1"
+                class="w-full p-1 border rounded-md text-sm"
+              />
+            </div>
+          </div>
+
+          <!-- Kontainer untuk dua tombol: MULAI dan RESET -->
+          <div class="flex space-x-2 mt-4">
+            <button
+              id="start-button"
+              class="flex-1 bg-accent-orange text-white font-bold py-2 rounded-lg shadow-md hover:bg-orange-600 transition duration-300"
+            >
+              Mulai
+            </button>
+            <button
+              id="reset-button"
+              class="flex-1 bg-gray-500 text-white font-bold py-2 rounded-lg shadow-md hover:bg-gray-600 transition duration-300"
+            >
+              Reset
+            </button>
+          </div>
+          <p class="text-xs text-gray-500 mt-2 text-center">
+            Gunakan mouse atau sentuh untuk memutar/menggeser tampilan 3D.
+          </p>
+        </section>
+
+        <!-- Bagian Hasil & Data -->
+        <section class="mt-4 p-4 bg-gray-100 rounded-lg shadow-inner">
+          <h2 class="text-xl font-bold mb-2 text-primary-blue">
+            Hasil Simulasi
+          </h2>
+          <div class="text-sm space-y-1">
+            <p class="font-medium">
+              Total Momentum Awal:
+              <span id="initial-momentum" class="font-bold text-green-700"
+                >0.00 kg.m/s</span
+              >
+            </p>
+            <p class="font-medium">
+              Total Momentum Akhir:
+              <span id="final-momentum" class="font-bold text-green-700"
+                >N/A</span
+              >
+            </p>
+            <p class="font-medium text-red-600">
+              Kehilangan Energi Kinetik:
+              <span id="energy-loss" class="font-bold">N/A</span>
+            </p>
+            <p class="mt-3 font-semibold text-primary-blue">
+              Kecepatan Akhir (Terhitung):
+            </p>
+            <ul class="text-xs list-disc list-inside ml-4">
+              <li>Objek 1 v₁𝒇: <span id="v1f-calc">N/A</span> m/s</li>
+              <li>Objek 2 v₂𝒇: <span id="v2f-calc">N/A</span> m/s</li>
+            </ul>
+          </div>
+        </section>
+      </div>
+
+      <!-- Panel Kanan: Canvas 3D Three.js (60%) -->
+      <div
+        id="canvas-wrapper"
+        class="lg:w-3/5 bg-gray-800 relative overflow-hidden"
+      >
+        <div id="three-canvas" class="w-full h-full"></div>
+
+        <!-- Identitas Kelompok -->
+        <div
+          class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-gray-200 z-20"
+        >
+          <h3
+            class="text-xs font-bold text-gray-400 mb-2 border-b pb-1 uppercase tracking-wide"
+          >
+            Identitas Kelompok
+          </h3>
+          <table class="text-xs text-right border-separate border-spacing-y-1">
+            <tbody>
+              <tr>
+                <td class="pr-3 font-medium text-gray-600">
+                  Muhammad Rafli Abdillah
+                </td>
+                <td class="font-bold text-gray-800 font-mono">5025231028</td>
+              </tr>
+              <tr>
+                <td class="pr-3 font-medium text-gray-600">
+                  Clive Kenaz Fausto Sulastomo
+                </td>
+                <td class="font-bold text-gray-800 font-mono">5025231029</td>
+              </tr>
+              <tr>
+                <td class="pr-3 font-medium text-gray-600">
+                  Muhammad Rizky Rahmadian Makkani
+                </td>
+                <td class="font-bold text-gray-800 font-mono">5025231035</td>
+              </tr>
+            </tbody>
+          </table>
         </div>
 
-        <div id="canvas-wrapper" class="lg:w-2/3 bg-gray-800 relative overflow-hidden">
-            
-            <div id="three-canvas" class="w-full h-full"></div>
-
-            <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-gray-200 z-20">
-                <h3 class="text-xs font-bold text-gray-400 mb-2 border-b pb-1 uppercase tracking-wide">Identitas Kelompok</h3>
-                <table class="text-xs text-right border-separate border-spacing-y-1">
-                    <tbody>
-                        <tr>
-                            <td class="pr-3 font-medium text-gray-600">Muhammad Rafli Abdillah</td>
-                            <td class="font-bold text-gray-800 font-mono">5025231028</td>
-                        </tr>
-                        <tr>
-                            <td class="pr-3 font-medium text-gray-600">Clive Kenaz Fausto Sulastomo</td>
-                            <td class="font-bold text-gray-800 font-mono">5025231029</td>
-                        </tr>
-                        <tr>
-                            <td class="pr-3 font-medium text-gray-600">Muhammad Rizky Rahmadian Makkani</td>
-                            <td class="font-bold text-gray-800 font-mono">5025231035</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-
-            <div id="overlay-text" class="absolute top-4 left-1/2 transform -translate-x-1/2 p-2 bg-black bg-opacity-70 text-white rounded-lg text-sm font-mono transition-opacity duration-500 z-10 pointer-events-none">
-                Simulasi Siap
-            </div>
-            
-            <div class="absolute bottom-4 right-4 text-xs text-white bg-black bg-opacity-50 p-2 rounded pointer-events-none">
-                m: Massa (kg) | vi: Kecepatan awal (m/s) | vf: Kecepatan akhir (m/s) 
-            </div>
+        <!-- Status Overlay -->
+        <div
+          id="overlay-text"
+          class="absolute top-4 left-1/2 transform -translate-x-1/2 p-2 bg-black bg-opacity-70 text-white rounded-lg text-sm font-mono transition-opacity duration-500 z-10 pointer-events-none"
+        >
+          Simulasi Siap
         </div>
 
+        <!-- Keterangan Legend (Menggunakan Unicode) -->
+        <div
+          class="absolute bottom-4 right-4 text-xs text-white bg-black bg-opacity-50 p-2 rounded pointer-events-none"
+        >
+          m: Massa (kg) | vᵢ: Kecepatan awal (m/s) | v𝒇: Kecepatan akhir (m/s)
+        </div>
+      </div>
     </main>
 
-    <script>
-        let scene, camera, renderer, ball1, ball2, plane, controls;
-        let v1i, v2i, m1, m2;
-        let v1f, v2f;
-        let isSimulating = false;
-        let hasCollided = false;
-        const radiusScale = 0.5;
-
-        const startButton = document.getElementById('start-button');
-        const resetButton = document.getElementById('reset-button');
-        
-        // Mengambil element #three-canvas untuk rendering, dan #canvas-wrapper untuk resize event parent
-        const canvasContainer = document.getElementById('three-canvas');
-        const wrapper = document.getElementById('canvas-wrapper'); 
-
-        const initialMomentumDisplay = document.getElementById('initial-momentum');
-        const finalMomentumDisplay = document.getElementById('final-momentum');
-        const v1fCalcDisplay = document.getElementById('v1f-calc');
-        const v2fCalcDisplay = document.getElementById('v2f-calc');
-        const statusMessage = document.getElementById('status-message');
-        const overlayText = document.getElementById('overlay-text');
-        
-        function init() {
-            scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x202025);
-
-            // Gunakan wrapper size untuk inisialisasi agar pas
-            camera = new THREE.PerspectiveCamera(45, wrapper.clientWidth / wrapper.clientHeight, 0.1, 1000);
-            camera.position.set(0, 10, 25);
-            camera.lookAt(0, 0, 0);
-
-            renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(wrapper.clientWidth, wrapper.clientHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
-            renderer.shadowMap.enabled = true;
-            canvasContainer.appendChild(renderer.domElement);
-
-            controls = new THREE.OrbitControls(camera, renderer.domElement);
-            controls.enableDamping = true;
-            controls.dampingFactor = 0.05;
-            controls.maxPolarAngle = Math.PI / 2;
-
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
-            scene.add(ambientLight);
-
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-            directionalLight.position.set(10, 20, 10);
-            directionalLight.castShadow = true;
-            scene.add(directionalLight);
-
-            const gridHelper = new THREE.GridHelper(100, 50, 0x888888, 0x444444);
-            scene.add(gridHelper);
-
-            const planeGeometry = new THREE.PlaneGeometry(100, 50);
-            const planeMaterial = new THREE.ShadowMaterial({ opacity: 0.3 });
-            plane = new THREE.Mesh(planeGeometry, planeMaterial);
-            plane.rotation.x = -Math.PI / 2;
-            plane.position.y = -0.01;
-            plane.receiveShadow = true;
-            scene.add(plane);
-
-            createBalls();
-            window.addEventListener('resize', onWindowResize, false);
-        }
-
-        function createBalls() {
-            m1 = parseFloat(document.getElementById('m1').value);
-            m2 = parseFloat(document.getElementById('m2').value);
-
-            if (ball1) scene.remove(ball1);
-            if (ball2) scene.remove(ball2);
-
-            const r1 = radiusScale * Math.cbrt(m1);
-            const geometry1 = new THREE.SphereGeometry(r1, 32, 32);
-            const material1 = new THREE.MeshStandardMaterial({ color: 0xff4444, roughness: 0.4, metalness: 0.3 });
-            ball1 = new THREE.Mesh(geometry1, material1);
-            ball1.position.set(-10, r1, 0);
-            ball1.userData = { mass: m1, initialRadius: r1 };
-            ball1.castShadow = true;
-            scene.add(ball1);
-
-            const r2 = radiusScale * Math.cbrt(m2);
-            const geometry2 = new THREE.SphereGeometry(r2, 32, 32);
-            const material2 = new THREE.MeshStandardMaterial({ color: 0x44ff44, roughness: 0.4, metalness: 0.3 });
-            ball2 = new THREE.Mesh(geometry2, material2);
-            ball2.position.set(10, r2, 0);
-            ball2.userData = { mass: m2, initialRadius: r2 };
-            ball2.castShadow = true;
-            scene.add(ball2);
-        }
-
-        function onWindowResize() {
-            // Menggunakan wrapper untuk mendapatkan ukuran yang benar saat resize
-            const width = wrapper.clientWidth;
-            const height = wrapper.clientHeight;
-            camera.aspect = width / height;
-            camera.updateProjectionMatrix();
-            renderer.setSize(width, height);
-        }
-
-        function calculateFinalVelocities(m1, v1i, m2, v2i) {
-            const v1f = (v1i * (m1 - m2) + 2 * m2 * v2i) / (m1 + m2);
-            const v2f = (v2i * (m2 - m1) + 2 * m1 * v1i) / (m1 + m2);
-            return { v1f, v2f };
-        }
-
-        function startSimulation() {
-            isSimulating = false;
-            hasCollided = false;
-            statusMessage.classList.add('hidden');
-            overlayText.textContent = "Simulasi Siap";
-            overlayText.classList.remove('opacity-0');
-            
-            m1 = parseFloat(document.getElementById('m1').value);
-            v1i = parseFloat(document.getElementById('v1i').value);
-            m2 = parseFloat(document.getElementById('m2').value);
-            v2i = parseFloat(document.getElementById('v2i').value);
-
-            if (m1 <= 0 || m2 <= 0) {
-                statusMessage.textContent = "Massa harus lebih besar dari 0!";
-                statusMessage.classList.remove('hidden');
-                return;
-            }
-            if (v1i === v2i) {
-                statusMessage.textContent = "Kecepatan awal tidak boleh sama!";
-                statusMessage.classList.remove('hidden');
-                return;
-            }
-            if (v1i < v2i) {
-                statusMessage.textContent = "Objek 1 harus lebih cepat dari Objek 2 agar bertabrakan!";
-                statusMessage.classList.remove('hidden');
-                return;
-            }
-
-            const results = calculateFinalVelocities(m1, v1i, m2, v2i);
-            v1f = results.v1f;
-            v2f = results.v2f;
-
-            initialMomentumDisplay.textContent = `${(m1 * v1i + m2 * v2i).toFixed(2)} kg.m/s`;
-            finalMomentumDisplay.textContent = `Menunggu Tumbukan...`;
-            v1fCalcDisplay.textContent = v1f.toFixed(2);
-            v2fCalcDisplay.textContent = v2f.toFixed(2);
-
-            createBalls();
-            ball1.position.x = -10;
-            ball2.position.x = 10;
-
-            overlayText.textContent = "Tumbukan Dimulai...";
-            startButton.disabled = true;
-            startButton.textContent = "Simulasi Berjalan...";
-            resetButton.disabled = false;
-            
-            isSimulating = true;
-        }
-
-        let lastTime = 0;
-
-        function animate(time) {
-            requestAnimationFrame(animate);
-            
-            if(controls) controls.update();
-
-            if (isSimulating) {
-                const deltaTime = (time - lastTime) / 1000;
-                const safeDelta = Math.min(deltaTime, 0.1); 
-                
-                if (!hasCollided) {
-                    ball1.position.x += v1i * safeDelta * 3;
-                    ball2.position.x += v2i * safeDelta * 3;
-
-                    const r1 = ball1.userData.initialRadius;
-                    const r2 = ball2.userData.initialRadius;
-                    const distance = ball2.position.x - ball1.position.x;
-
-                    if (distance <= (r1 + r2)) {
-                        hasCollided = true;
-                        const momentumAkhirSimulasi = (m1 * v1f + m2 * v2f).toFixed(2);
-                        finalMomentumDisplay.textContent = `${momentumAkhirSimulasi} kg.m/s`;
-                        
-                        const overlap = (r1 + r2) - distance;
-                        const totalMass = m1 + m2;
-                        ball1.position.x -= (overlap * m2 / totalMass);
-                        ball2.position.x += (overlap * m1 / totalMass);
-
-                        overlayText.textContent = `TUMBUKAN! P: ${momentumAkhirSimulasi}`;
-                    }
-                } else {
-                    ball1.position.x += v1f * safeDelta * 3;
-                    ball2.position.x += v2f * safeDelta * 3;
-
-                    if (ball1.position.x < -25 || ball1.position.x > 25 || ball2.position.x < -25 || ball2.position.x > 25) {
-                        isSimulating = false;
-                        startButton.disabled = false;
-                        startButton.textContent = "Mulai Simulasi";
-                        overlayText.textContent = "Selesai.";
-                    }
-                }
-            }
-            lastTime = time;
-            renderer.render(scene, camera);
-        }
-
-        window.onload = function () {
-            init();
-            animate(0);
-            startButton.addEventListener('click', startSimulation);
-            resetButton.addEventListener('click', startSimulation);
-            startSimulation();
-        }
-    </script>
-</body>
+    <!-- Pemuatan Logika Utama (Link ke berkas script.js) -->
+    <script src="script.js"></script>
+  </body>
 </html>
