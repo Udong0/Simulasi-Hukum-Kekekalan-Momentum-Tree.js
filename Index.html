@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Simulasi Hukum Kekekalan Momentum (3D Interaktif)</title>
+    <title>Simulasi Hukum Kekekalan Momentum</title>
     <script src="https://cdn.tailwindcss.com"></script>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -29,9 +29,33 @@
 </head>
 <body class="bg-gray-50 h-screen overflow-hidden flex flex-col">
 
-    <header class="bg-white shadow-md p-4 flex justify-between items-center z-10">
-        <h1 class="text-2xl font-extrabold text-primary-blue">Simulasi Fisika 3D</h1>
-        <div class="text-sm font-medium text-gray-600">Hukum Kekekalan Momentum</div>
+    <header class="bg-white shadow-md p-4 flex justify-between items-start z-10">
+        <div class="flex items-center h-full mt-2">
+            <h1 class="text-2xl font-extrabold text-primary-blue">Simulasi Fisika 3D</h1>
+        </div>
+
+        <div class="flex flex-col items-end">
+            <div class="text-sm font-medium text-gray-600 mb-2">Hukum Kekekalan Momentum</div>
+            
+            <div class="bg-gray-50 border border-gray-200 p-2 rounded-md shadow-sm">
+                <table class="text-xs text-right border-separate border-spacing-y-1">
+                    <tbody>
+                        <tr>
+                            <td class="pr-3 font-medium text-gray-500">Muhammad Rafli Abdillah</td>
+                            <td class="font-bold text-gray-800">5025231028</td>
+                        </tr>
+                        <tr>
+                            <td class="pr-3 font-medium text-gray-500">Clive Kenaz Fausto Sulastomo</td>
+                            <td class="font-bold text-gray-800">5025231029</td>
+                        </tr>
+                        <tr>
+                            <td class="pr-3 font-medium text-gray-500">Mohammad Rizky Rahmadian Makkani</td>
+                            <td class="font-bold text-gray-800">5025231035</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            </div>
     </header>
 
     <main class="flex-grow flex flex-col lg:flex-row overflow-hidden">
@@ -47,9 +71,9 @@
                     m1 v1i + m2 v2i = m1 v1f + m2 v2f
                 </p>
                 <ul class="text-xs list-disc list-inside mt-2 text-gray-600">
-                    <li>Klik kiri + Geser: <strong>Putar Kamera</strong></li>
-                    <li>Klik kanan + Geser: <strong>Geser Kamera (Pan)</strong></li>
-                    <li>Scroll Mouse: <strong>Zoom In/Out</strong></li>
+                    <li>m: Massa (kg)</li>
+                    <li>vi: Kecepatan awal (m/s)</li>
+                    <li>vf: Kecepatan akhir (m/s)</li>
                 </ul>
             </section>
 
@@ -104,14 +128,14 @@
                 Simulasi Siap
             </div>
             <div class="absolute bottom-4 right-4 text-xs text-white bg-black bg-opacity-50 p-2 rounded pointer-events-none">
-                Kiri: Putar | Kanan: Geser | Scroll: Zoom
+                m: Massa (kg) | vi: Kecepatan awal (m/s) | vf: Kecepatan akhir (m/s) 
             </div>
         </div>
 
     </main>
 
     <script>
-        let scene, camera, renderer, ball1, ball2, plane, controls; // Tambah controls
+        let scene, camera, renderer, ball1, ball2, plane, controls;
         let v1i, v2i, m1, m2;
         let v1f, v2f;
         let isSimulating = false;
@@ -130,27 +154,23 @@
         
         function init() {
             scene = new THREE.Scene();
-            scene.background = new THREE.Color(0x202025); // Background lebih gelap & elegan
+            scene.background = new THREE.Color(0x202025);
 
-            // Camera
             camera = new THREE.PerspectiveCamera(45, canvasContainer.clientWidth / canvasContainer.clientHeight, 0.1, 1000);
-            camera.position.set(0, 10, 25); // Posisi kamera lebih tinggi dan jauh
+            camera.position.set(0, 10, 25);
             camera.lookAt(0, 0, 0);
 
-            // Renderer
             renderer = new THREE.WebGLRenderer({ antialias: true });
             renderer.setSize(canvasContainer.clientWidth, canvasContainer.clientHeight);
             renderer.setPixelRatio(window.devicePixelRatio);
-            renderer.shadowMap.enabled = true; // Aktifkan bayangan
+            renderer.shadowMap.enabled = true;
             canvasContainer.appendChild(renderer.domElement);
 
-            // --- ORBIT CONTROLS (Ini yang membuat kamera bisa diputar) ---
             controls = new THREE.OrbitControls(camera, renderer.domElement);
-            controls.enableDamping = true; // Pergerakan lebih halus
+            controls.enableDamping = true;
             controls.dampingFactor = 0.05;
-            controls.maxPolarAngle = Math.PI / 2; // Mencegah kamera masuk ke bawah tanah
+            controls.maxPolarAngle = Math.PI / 2;
 
-            // Pencahayaan
             const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
             scene.add(ambientLight);
 
@@ -159,17 +179,14 @@
             directionalLight.castShadow = true;
             scene.add(directionalLight);
 
-            // Permukaan (Lantai) dengan Grid Helper
-            // 1. Grid Helper (Garis-garis)
             const gridHelper = new THREE.GridHelper(100, 50, 0x888888, 0x444444);
             scene.add(gridHelper);
 
-            // 2. Bidang transparan untuk menangkap bayangan (opsional)
             const planeGeometry = new THREE.PlaneGeometry(100, 50);
             const planeMaterial = new THREE.ShadowMaterial({ opacity: 0.3 });
             plane = new THREE.Mesh(planeGeometry, planeMaterial);
             plane.rotation.x = -Math.PI / 2;
-            plane.position.y = -0.01; // Sedikit di bawah grid
+            plane.position.y = -0.01;
             plane.receiveShadow = true;
             scene.add(plane);
 
@@ -184,17 +201,15 @@
             if (ball1) scene.remove(ball1);
             if (ball2) scene.remove(ball2);
 
-            // Objek 1 (Merah)
             const r1 = radiusScale * Math.cbrt(m1);
             const geometry1 = new THREE.SphereGeometry(r1, 32, 32);
-            const material1 = new THREE.MeshStandardMaterial({ color: 0xff4444, roughness: 0.4, metalness: 0.3 }); // Ganti jadi StandardMaterial agar bereaksi cahaya lebih bagus
+            const material1 = new THREE.MeshStandardMaterial({ color: 0xff4444, roughness: 0.4, metalness: 0.3 });
             ball1 = new THREE.Mesh(geometry1, material1);
-            ball1.position.set(-10, r1, 0); // y = r1 karena lantai di 0
+            ball1.position.set(-10, r1, 0);
             ball1.userData = { mass: m1, initialRadius: r1 };
-            ball1.castShadow = true; // Bola punya bayangan
+            ball1.castShadow = true;
             scene.add(ball1);
 
-            // Objek 2 (Hijau)
             const r2 = radiusScale * Math.cbrt(m2);
             const geometry2 = new THREE.SphereGeometry(r2, 32, 32);
             const material2 = new THREE.MeshStandardMaterial({ color: 0x44ff44, roughness: 0.4, metalness: 0.3 });
@@ -273,12 +288,10 @@
         function animate(time) {
             requestAnimationFrame(animate);
             
-            // Update Controls (Wajib untuk damping/kehalusan rotasi)
             if(controls) controls.update();
 
             if (isSimulating) {
                 const deltaTime = (time - lastTime) / 1000;
-                // Cegah lonjakan waktu besar jika tab tidak aktif
                 const safeDelta = Math.min(deltaTime, 0.1); 
                 
                 if (!hasCollided) {
@@ -294,7 +307,6 @@
                         const momentumAkhirSimulasi = (m1 * v1f + m2 * v2f).toFixed(2);
                         finalMomentumDisplay.textContent = `${momentumAkhirSimulasi} kg.m/s`;
                         
-                        // Koreksi posisi overlapping
                         const overlap = (r1 + r2) - distance;
                         const totalMass = m1 + m2;
                         ball1.position.x -= (overlap * m2 / totalMass);
