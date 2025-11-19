@@ -70,17 +70,61 @@
             m₁ v₁ᵢ + m₂ v₂ᵢ = m₁ v₁f + m₂ v₂f
           </p>
 
-          <p class="mt-2 text-sm font-semibold text-gray-800">
-            <span class="text-primary-blue">Koefisien Restitusi:</span><br />
-            e = – (v₁f – v₂f) / (v₁ᵢ – v₂ᵢ)
+          <p class="mt-4 text-sm font-semibold text-gray-800 border-b pb-1">
+            Jenis-Jenis Tumbukan Berdasarkan Koefisien Restitusi (e):
           </p>
+          <div class="space-y-3 text-xs text-gray-700 mt-2">
+            <!-- Tumbukan Elastis Sempurna -->
+            <div>
+              <span class="font-bold text-green-600"
+                >1. Elastis Sempurna (e = 1)</span
+              >
+              <ul class="list-disc list-inside ml-4 mt-1 space-y-0.5">
+                <li>Momentum dan Energi Kinetik (KE) keduanya kekal.</li>
+                <li>
+                  Objek akan terpantul dengan kecepatan relatif yang sama persis
+                  seperti saat mendekat.
+                </li>
+                <li>Simulasikan dengan menggeser slider e ke 1.0.</li>
+              </ul>
+            </div>
+            <!-- Tumbukan Tidak Elastis Sebagian -->
+            <div>
+              <span class="font-bold text-yellow-600"
+                >2. Tidak Elastis Sebagian (0 < e < 1)</span
+              >
+              <ul class="list-disc list-inside ml-4 mt-1 space-y-0.5">
+                <li>
+                  Momentum kekal, namun Energi Kinetik berkurang (hilang menjadi
+                  panas, suara).
+                </li>
+                <li>
+                  Kehilangan energi terjadi karena objek mengalami deformasi
+                  (perubahan bentuk) permanen atau karena gesekan internal saat
+                  bertumbukan.
+                </li>
+                <li>
+                  Simulasikan dengan menggeser slider e antara 0.0 hingga 1.0.
+                </li>
+              </ul>
+            </div>
+            <!-- Tumbukan Tidak Elastis Sempurna -->
+            <div>
+              <span class="font-bold text-red-600"
+                >3. Tidak Elastis Sempurna (e = 0)</span
+              >
+              <ul class="list-disc list-inside ml-4 mt-1 space-y-0.5">
+                <li>Momentum kekal, namun KE hilang maksimal.</li>
+                <li>
+                  Kedua objek akan menempel dan bergerak bersama sebagai satu
+                  kesatuan dengan kecepatan yang sama.
+                </li>
+                <li>Simulasikan dengan menggeser slider e ke 0.0.</li>
+              </ul>
+            </div>
+          </div>
 
-          <ul class="text-xs list-disc list-inside mt-1 text-gray-600">
-            <li>e = 1 : Elastis sempurna</li>
-            <li>e = 0 : Tidak elastis sempurna (objek menempel)</li>
-          </ul>
-
-          <ul class="text-xs list-disc list-inside mt-2 text-gray-600">
+          <ul class="text-xs list-disc list-inside mt-4 text-gray-600">
             <li>m : massa (kg)</li>
             <li>vᵢ : kecepatan awal (m/s)</li>
             <li>v𝒇 : kecepatan akhir (m/s)</li>
@@ -289,7 +333,6 @@
       </div>
     </main>
 
-    <!-- Pemuatan Logika Utama (Link ke berkas script.js) -->
     <script src="script.js"></script>
   </body>
 </html>
