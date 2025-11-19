@@ -28,10 +28,13 @@ function calculateKineticEnergy(m1, v1, m2, v2) {
 }
 
 function calculateFinalVelocities(m1, v1i, m2, v2i, e) {
-  const v1f =
-    (v1i * (m1 - m2) + 2 * m2 * v2i - m2 * e * (v1i - v2i)) / (m1 + m2);
-  const v2f =
-    (v2i * (m2 - m1) + 2 * m1 * v1i + m1 * e * (v1i - v2i)) / (m1 + m2);
+  const totalMomentum = m1 * v1i + m2 * v2i;
+  const relativeVelocity = v1i - v2i;
+  const totalMass = m1 + m2;
+
+  const v1f = (totalMomentum - m2 * e * relativeVelocity) / totalMass;
+  const v2f = (totalMomentum + m1 * e * relativeVelocity) / totalMass;
+
   return { v1f, v2f };
 }
 
@@ -55,7 +58,7 @@ function updateMomentumDisplay() {
   v1fCalcDisplay.textContent = results.v1f.toFixed(2);
   v2fCalcDisplay.textContent = results.v2f.toFixed(2);
 
-  if (parseFloat(energyLoss) > 0.01) {
+  if (energyLoss > 0.01) {
     energyLossDisplay.classList.remove("text-green-700");
     energyLossDisplay.classList.add("text-red-600");
   } else {
@@ -267,7 +270,10 @@ window.onload = function () {
     input.addEventListener("input", updateMomentumDisplay);
   });
 
-  restitutionSlider.addEventListener("input", updateMomentumDisplay);
+  restitutionSlider.addEventListener("input", (e) => {
+    restitutionValueDisplay.textContent = parseFloat(e.target.value).toFixed(2); // Update display angka slider
+    updateMomentumDisplay();
+  });
 
   updateMomentumDisplay();
   startSimulation();

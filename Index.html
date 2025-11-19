@@ -98,7 +98,6 @@
                 </li>
               </ul>
             </div>
-
             <div>
               <span class="font-bold text-red-600"
                 >3. Tidak Elastis Sempurna (e = 0)</span
@@ -136,21 +135,31 @@
             <label
               for="restitution-coefficient"
               class="block text-sm font-bold text-gray-700 mb-2"
-              >Koefisien Restitusi (e):
+            >
+              Koefisien Restitusi (e):
               <span id="e-value" class="font-mono text-accent-orange"
                 >1.00</span
-              ></label
-            >
-            <input
-              type="range"
-              id="restitution-coefficient"
-              min="0.0"
-              max="1.0"
-              step="0.01"
-              value="1.0"
-              class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
-            />
-            <p class="text-xs text-gray-500 mt-1">Atur kekenyalan tumbukan.</p>
+              >
+            </label>
+
+            <div class="flex items-center space-x-3">
+              <span class="text-xs font-bold text-gray-600">0</span>
+              <input
+                type="range"
+                id="restitution-coefficient"
+                min="0.0"
+                max="1.0"
+                step="0.01"
+                value="0.0"
+                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-accent-orange"
+              />
+              <span class="text-xs font-bold text-gray-600">1</span>
+            </div>
+
+            <div class="flex justify-between text-[10px] text-gray-500 mt-1">
+              <span>(Tidak Elastis)</span>
+              <span>(Elastis)</span>
+            </div>
           </div>
 
           <div class="grid grid-cols-2 gap-4">
