@@ -5,13 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Simulasi Hukum Kekekalan Momentum (Three.js)</title>
 
-    <!-- Pemuatan CSS (Link ke berkas style.css) -->
     <link rel="stylesheet" href="style.css" />
 
-    <!-- Pemuatan CSS Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-      // Konfigurasi Tailwind untuk warna kustom (Perlu tetap di sini agar konfigurasi warna di HTML dikenal)
       tailwind.config = {
         theme: {
           extend: {
@@ -24,12 +21,10 @@
       };
     </script>
 
-    <!-- Pemuatan JavaScript Libraries (Diletakkan di body/atas untuk memastikan pemuatan berurutan) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
   </head>
   <body class="bg-gray-50 h-screen overflow-hidden flex flex-col">
-    <!-- Header Aplikasi -->
     <header
       class="bg-white shadow-md p-4 flex justify-between items-center z-10"
     >
@@ -43,13 +38,10 @@
       </div>
     </header>
 
-    <!-- Konten Utama: Teori, Input, dan Canvas -->
     <main class="flex-grow flex flex-col lg:flex-row overflow-hidden">
-      <!-- Panel Kiri: Teori & Kontrol Input (40%) -->
       <div
         class="lg:w-2/5 p-6 overflow-y-auto bg-white shadow-lg flex flex-col space-y-6"
       >
-        <!-- Bagian Teori (Menggunakan Unicode) -->
         <section>
           <h2
             class="text-xl font-bold mb-3 text-accent-orange border-b-2 border-accent-orange pb-1"
@@ -74,7 +66,6 @@
             Jenis-Jenis Tumbukan Berdasarkan Koefisien Restitusi (e):
           </p>
           <div class="space-y-3 text-xs text-gray-700 mt-2">
-            <!-- Tumbukan Elastis Sempurna -->
             <div>
               <span class="font-bold text-green-600"
                 >1. Elastis Sempurna (e = 1)</span
@@ -88,7 +79,6 @@
                 <li>Simulasikan dengan menggeser slider e ke 1.0.</li>
               </ul>
             </div>
-            <!-- Tumbukan Tidak Elastis Sebagian -->
             <div>
               <span class="font-bold text-yellow-600"
                 >2. Tidak Elastis Sebagian (0 < e < 1)</span
@@ -108,7 +98,7 @@
                 </li>
               </ul>
             </div>
-            <!-- Tumbukan Tidak Elastis Sempurna -->
+
             <div>
               <span class="font-bold text-red-600"
                 >3. Tidak Elastis Sempurna (e = 0)</span
@@ -131,7 +121,6 @@
           </ul>
         </section>
 
-        <!-- Bagian Input & Kontrol -->
         <section class="mt-4 p-4 bg-gray-100 rounded-lg shadow-inner">
           <h2 class="text-xl font-bold mb-4 text-primary-blue">
             Input Variabel
@@ -141,7 +130,6 @@
             class="text-sm text-red-600 mb-3 hidden"
           ></div>
 
-          <!-- Slider Koefisien Restitusi -->
           <div
             class="mb-4 p-3 bg-yellow-100 rounded-md border border-yellow-200"
           >
@@ -166,7 +154,6 @@
           </div>
 
           <div class="grid grid-cols-2 gap-4">
-            <!-- Objek 1 -->
             <div class="p-3 bg-white rounded-md border border-gray-200">
               <h3 class="font-bold text-sm text-primary-blue">
                 Objek 1 (Merah)
@@ -194,7 +181,6 @@
               />
             </div>
 
-            <!-- Objek 2 -->
             <div class="p-3 bg-white rounded-md border border-gray-200">
               <h3 class="font-bold text-sm text-primary-blue">
                 Objek 2 (Hijau)
@@ -223,7 +209,6 @@
             </div>
           </div>
 
-          <!-- Kontainer untuk dua tombol: MULAI dan RESET -->
           <div class="flex space-x-2 mt-4">
             <button
               id="start-button"
@@ -243,7 +228,6 @@
           </p>
         </section>
 
-        <!-- Bagian Hasil & Data -->
         <section class="mt-4 p-4 bg-gray-100 rounded-lg shadow-inner">
           <h2 class="text-xl font-bold mb-2 text-primary-blue">
             Hasil Simulasi
@@ -276,14 +260,12 @@
         </section>
       </div>
 
-      <!-- Panel Kanan: Canvas 3D Three.js (60%) -->
       <div
         id="canvas-wrapper"
         class="lg:w-3/5 bg-gray-800 relative overflow-hidden"
       >
         <div id="three-canvas" class="w-full h-full"></div>
 
-        <!-- Identitas Kelompok -->
         <div
           class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-gray-200 z-20"
         >
@@ -316,7 +298,6 @@
           </table>
         </div>
 
-        <!-- Status Overlay -->
         <div
           id="overlay-text"
           class="absolute top-4 left-1/2 transform -translate-x-1/2 p-2 bg-black bg-opacity-70 text-white rounded-lg text-sm font-mono transition-opacity duration-500 z-10 pointer-events-none"
@@ -324,7 +305,6 @@
           Simulasi Siap
         </div>
 
-        <!-- Keterangan Legend (Menggunakan Unicode) -->
         <div
           class="absolute bottom-4 right-4 text-xs text-white bg-black bg-opacity-50 p-2 rounded pointer-events-none"
         >
