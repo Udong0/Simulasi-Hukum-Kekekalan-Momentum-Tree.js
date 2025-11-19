@@ -50,12 +50,12 @@
                 </p>
                 <p class="mt-2 text-sm font-semibold text-gray-800">
                     <span class="text-primary-blue">Rumus:</span> 
-                    $m_1 v_{1i} + m_2 v_{2i} = m_1 v_{1f} + m_2 v_{2f}$
+                    m1 v1i + m2 v2i = m1 v1f + m2 v2f + m2 v2f
                 </p>
                 <ul class="text-xs list-disc list-inside mt-2 text-gray-600">
-                    <li>$m$: Massa (kg)</li>
-                    <li>$v_{i}$: Kecepatan awal (m/s)</li>
-                    <li>$v_{f}$: Kecepatan akhir (m/s)</li>
+                    <li>m: Massa (kg)</li>
+                    <li>vi: Kecepatan awal (m/s)</li>
+                    <li>vf: Kecepatan akhir (m/s)</li>
                 </ul>
             </section>
 
@@ -68,18 +68,18 @@
                     <!-- Objek 1 -->
                     <div class="p-3 bg-white rounded-md border border-gray-200">
                         <h3 class="font-bold text-sm text-primary-blue">Objek 1 (Merah)</h3>
-                        <label class="block mt-2 text-xs font-medium text-gray-600">Massa $m_1$ (kg)</label>
+                        <label class="block mt-2 text-xs font-medium text-gray-600">Massa m1 (kg)</label>
                         <input type="number" id="m1" value="2.0" min="0.1" step="0.1" class="w-full p-1 border rounded-md text-sm">
-                        <label class="block mt-2 text-xs font-medium text-gray-600">Kecepatan Awal $v_{1i}$ (m/s)</label>
+                        <label class="block mt-2 text-xs font-medium text-gray-600">Kecepatan Awal v1i (m/s)</label>
                         <input type="number" id="v1i" value="1.5" step="0.1" class="w-full p-1 border rounded-md text-sm">
                     </div>
 
                     <!-- Objek 2 -->
                     <div class="p-3 bg-white rounded-md border border-gray-200">
                         <h3 class="font-bold text-sm text-primary-blue">Objek 2 (Hijau)</h3>
-                        <label class="block mt-2 text-xs font-medium text-gray-600">Massa $m_2$ (kg)</label>
+                        <label class="block mt-2 text-xs font-medium text-gray-600">Massa m2 (kg)</label>
                         <input type="number" id="m2" value="1.0" min="0.1" step="0.1" class="w-full p-1 border rounded-md text-sm">
-                        <label class="block mt-2 text-xs font-medium text-gray-600">Kecepatan Awal $v_{2i}$ (m/s)</label>
+                        <label class="block mt-2 text-xs font-medium text-gray-600">Kecepatan Awal  v2i (m/s)</label>
                         <input type="number" id="v2i" value="-2.0" step="0.1" class="w-full p-1 border rounded-md text-sm">
                     </div>
                 </div>
@@ -103,8 +103,8 @@
                     <p class="font-medium">Total Momentum Akhir: <span id="final-momentum" class="font-bold text-green-700">N/A</span></p>
                     <p class="mt-3 font-semibold text-primary-blue">Kecepatan Akhir (Terhitung):</p>
                     <ul class="text-xs list-disc list-inside ml-4">
-                        <li>Objek 1 ($v_{1f}$): <span id="v1f-calc">N/A</span> m/s</li>
-                        <li>Objek 2 ($v_{2f}$): <span id="v2f-calc">N/A</span> m/s</li>
+                        <li>Objek 1 v1f: <span id="v1f-calc">N/A</span> m/s</li>
+                        <li>Objek 2 v2f: <span id="v2f-calc">N/A</span> m/s</li>
                     </ul>
                 </div>
             </section>
