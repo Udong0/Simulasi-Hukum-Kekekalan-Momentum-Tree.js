@@ -29,33 +29,11 @@
 </head>
 <body class="bg-gray-50 h-screen overflow-hidden flex flex-col">
 
-    <header class="bg-white shadow-md p-4 flex justify-between items-start z-10">
-        <div class="flex items-center h-full mt-2">
+    <header class="bg-white shadow-md p-4 flex justify-between items-center z-10">
+        <div>
             <h1 class="text-2xl font-extrabold text-primary-blue">Simulasi Fisika 3D</h1>
+            <div class="text-sm font-medium text-gray-600">Hukum Kekekalan Momentum</div>
         </div>
-
-        <div class="flex flex-col items-end">
-            <div class="text-sm font-medium text-gray-600 mb-2">Hukum Kekekalan Momentum</div>
-            
-            <div class="bg-gray-50 border border-gray-200 p-2 rounded-md shadow-sm">
-                <table class="text-xs text-right border-separate border-spacing-y-1">
-                    <tbody>
-                        <tr>
-                            <td class="pr-3 font-medium text-gray-500">Muhammad Rafli Abdillah</td>
-                            <td class="font-bold text-gray-800">5025231028</td>
-                        </tr>
-                        <tr>
-                            <td class="pr-3 font-medium text-gray-500">Clive Kenaz Fausto Sulastomo</td>
-                            <td class="font-bold text-gray-800">5025231029</td>
-                        </tr>
-                        <tr>
-                            <td class="pr-3 font-medium text-gray-500">Mohammad Rizky Rahmadian Makkani</td>
-                            <td class="font-bold text-gray-800">5025231035</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            </div>
     </header>
 
     <main class="flex-grow flex flex-col lg:flex-row overflow-hidden">
@@ -64,7 +42,7 @@
             <section>
                 <h2 class="text-xl font-bold mb-3 text-accent-orange border-b-2 border-accent-orange pb-1">Teori: Kekekalan Momentum</h2>
                 <p class="text-gray-700 text-sm">
-                    Hukum Kekekalan Momentum menyatakan bahwa total momentum sistem sebelum dan sesudah tumbukan adalah sama (pada sistem terisolasi).
+                    Hukum Kekekalan Momentum menyatakan bahwa jika tidak ada gaya luar yang bekerja pada sistem (sistem terisolasi), total momentum sistem tersebut sebelum dan sesudah tumbukan akan tetap sama.
                 </p>
                 <p class="mt-2 text-sm font-semibold text-gray-800">
                     <span class="text-primary-blue">Rumus:</span> 
@@ -123,10 +101,34 @@
             </section>
         </div>
 
-        <div id="canvas-container" class="lg:w-2/3 bg-gray-800 relative"> <div id="three-canvas" class="w-full h-full"></div>
-            <div id="overlay-text" class="absolute top-4 left-1/2 transform -translate-x-1/2 p-2 bg-black bg-opacity-70 text-white rounded-lg text-sm font-mono transition-opacity duration-500 z-20 pointer-events-none">
+        <div id="canvas-wrapper" class="lg:w-2/3 bg-gray-800 relative overflow-hidden">
+            
+            <div id="three-canvas" class="w-full h-full"></div>
+
+            <div class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-lg border border-gray-200 z-20">
+                <h3 class="text-xs font-bold text-gray-400 mb-2 border-b pb-1 uppercase tracking-wide">Identitas Kelompok</h3>
+                <table class="text-xs text-right border-separate border-spacing-y-1">
+                    <tbody>
+                        <tr>
+                            <td class="pr-3 font-medium text-gray-600">Muhammad Rafli Abdillah</td>
+                            <td class="font-bold text-gray-800 font-mono">5025231028</td>
+                        </tr>
+                        <tr>
+                            <td class="pr-3 font-medium text-gray-600">Clive Kenaz Fausto Sulastomo</td>
+                            <td class="font-bold text-gray-800 font-mono">5025231029</td>
+                        </tr>
+                        <tr>
+                            <td class="pr-3 font-medium text-gray-600">Muhammad Rizky Rahmadian Makkani</td>
+                            <td class="font-bold text-gray-800 font-mono">5025231035</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="overlay-text" class="absolute top-4 left-1/2 transform -translate-x-1/2 p-2 bg-black bg-opacity-70 text-white rounded-lg text-sm font-mono transition-opacity duration-500 z-10 pointer-events-none">
                 Simulasi Siap
             </div>
+            
             <div class="absolute bottom-4 right-4 text-xs text-white bg-black bg-opacity-50 p-2 rounded pointer-events-none">
                 m: Massa (kg) | vi: Kecepatan awal (m/s) | vf: Kecepatan akhir (m/s) 
             </div>
@@ -144,7 +146,11 @@
 
         const startButton = document.getElementById('start-button');
         const resetButton = document.getElementById('reset-button');
+        
+        // Mengambil element #three-canvas untuk rendering, dan #canvas-wrapper untuk resize event parent
         const canvasContainer = document.getElementById('three-canvas');
+        const wrapper = document.getElementById('canvas-wrapper'); 
+
         const initialMomentumDisplay = document.getElementById('initial-momentum');
         const finalMomentumDisplay = document.getElementById('final-momentum');
         const v1fCalcDisplay = document.getElementById('v1f-calc');
@@ -156,12 +162,13 @@
             scene = new THREE.Scene();
             scene.background = new THREE.Color(0x202025);
 
-            camera = new THREE.PerspectiveCamera(45, canvasContainer.clientWidth / canvasContainer.clientHeight, 0.1, 1000);
+            // Gunakan wrapper size untuk inisialisasi agar pas
+            camera = new THREE.PerspectiveCamera(45, wrapper.clientWidth / wrapper.clientHeight, 0.1, 1000);
             camera.position.set(0, 10, 25);
             camera.lookAt(0, 0, 0);
 
             renderer = new THREE.WebGLRenderer({ antialias: true });
-            renderer.setSize(canvasContainer.clientWidth, canvasContainer.clientHeight);
+            renderer.setSize(wrapper.clientWidth, wrapper.clientHeight);
             renderer.setPixelRatio(window.devicePixelRatio);
             renderer.shadowMap.enabled = true;
             canvasContainer.appendChild(renderer.domElement);
@@ -221,8 +228,9 @@
         }
 
         function onWindowResize() {
-            const width = canvasContainer.clientWidth;
-            const height = canvasContainer.clientHeight;
+            // Menggunakan wrapper untuk mendapatkan ukuran yang benar saat resize
+            const width = wrapper.clientWidth;
+            const height = wrapper.clientHeight;
             camera.aspect = width / height;
             camera.updateProjectionMatrix();
             renderer.setSize(width, height);
